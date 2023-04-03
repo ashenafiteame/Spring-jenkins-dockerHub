@@ -26,22 +26,16 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void delete(Long id) {
-        userRepository.deleteById(id);
-    }
-
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
     public void removeUser(Long id) {
-        Optional<User> user =userRepository.findById(id);
-        if (user.isPresent()){
-            emailSender.sendEmail("good buy",user.get().getEmail());
-            userRepository.delete(user.get());
-
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            emailSender.sendEmail("good buy ", user.get().getEmail());
+            userRepository.deleteById(id);
         }
-
 
 
     }

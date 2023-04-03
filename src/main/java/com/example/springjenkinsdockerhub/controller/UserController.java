@@ -21,6 +21,9 @@ public class UserController {
     public ResponseEntity<?> getAllUsers() {
         // retrieve the user with the given ID from the database
         List<User> users = userService.findAll();
+        if (users==null){
+            return new ResponseEntity<>(new CustomErrorMessage("Users not found please add first!" ),HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
@@ -28,18 +31,31 @@ public class UserController {
     public ResponseEntity<?> getUser(@PathVariable("id") Long id) {
         // retrieve the user with the given ID from the database
         User user = userService.findById(id);
+        if (user==null){
+            return new ResponseEntity<>(new CustomErrorMessage("User not with ID "+id+" not found!" ),HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<User>(user, HttpStatus.OK);
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> saveUser(@ModelAttribute("user") User user) {
+    public ResponseEntity<?> saveUser(@RequestBody User user) {
         // save the user to the database
         userService.save(user);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@ModelAttribute("user") User user, @PathVariable("id") Long id) {
+    public ResponseEntity<?> updateUser(@RequestBody User newUser, @PathVariable("id") Long id) {
+        User user = userService.findById(id);
+        if (user == null) {
+            return new ResponseEntity<>(
+                    new CustomErrorMessage("User with id= " + id + " not available"), HttpStatus.NOT_FOUND);
+        }
+        //update user with the new data
+        user.setEmail(newUser.getEmail());
+        user.setUsername(newUser.getUsername());
+        user.setPassword(newUser.getPassword());
+
         // save the user to the database
         userService.save(user);
         return new ResponseEntity<>(user, HttpStatus.OK);
